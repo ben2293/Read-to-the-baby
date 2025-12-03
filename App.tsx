@@ -63,7 +63,8 @@ const App: React.FC = () => {
       streamRef.current = stream;
       
       // 3. Connect to Gemini Live
-      const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_API_KEY      const sessionPromise = ai.live.connect({
+      const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_API_KEY });
+      const sessionPromise = ai.live.connect({
         model: LIVE_CONFIG.model,
         config: {
             responseModalities: [Modality.AUDIO],
