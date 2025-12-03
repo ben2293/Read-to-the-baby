@@ -239,7 +239,7 @@ const App: React.FC = () => {
 
 
   // Render Helpers
-  if (!process.env.API_KEY) {
+  if (!import.meta.env.VITE_API_KEY) {
       return (
           <div className="min-h-screen flex items-center justify-center bg-slate-900 text-white">
               <div className="p-8 bg-red-900/50 rounded-lg border border-red-500">
