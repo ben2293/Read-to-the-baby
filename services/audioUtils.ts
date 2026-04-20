@@ -1,54 +1,52 @@
-import { Blob } from '@google/genai';
+// Synthesize a baby-like cry using Web Audio API
+export function startCrySound(audioContext: AudioContext): () => void {
+  const masterGain = audioContext.createGain();
+  masterGain.gain.value = 0.3;
+  masterGain.connect(audioContext.destination);
 
-export function base64ToUint8Array(base64: string): Uint8Array {
-  const binaryString = atob(base64);
-  const len = binaryString.length;
-  const bytes = new Uint8Array(len);
-  for (let i = 0; i < len; i++) {
-    bytes[i] = binaryString.charCodeAt(i);
-  }
-  return bytes;
-}
+  // Main cry oscillator — high sawtooth
+  const osc = audioContext.createOscillator();
+  osc.type = 'sawtooth';
+  osc.frequency.value = 520;
 
-export function arrayBufferToBase64(buffer: ArrayBuffer): string {
-  let binary = '';
-  const bytes = new Uint8Array(buffer);
-  const len = bytes.byteLength;
-  for (let i = 0; i < len; i++) {
-    binary += String.fromCharCode(bytes[i]);
-  }
-  return btoa(binary);
-}
+  // Fast pitch LFO — 5Hz makes it sound like wailing, not a siren
+  const pitchLfo = audioContext.createOscillator();
+  const pitchLfoGain = audioContext.createGain();
+  pitchLfo.type = 'sine';
+  pitchLfo.frequency.value = 5;
+  pitchLfoGain.gain.value = 35; // narrow swing = baby, wide swing = ambulance
+  pitchLfo.connect(pitchLfoGain);
+  pitchLfoGain.connect(osc.frequency);
 
-export function createPcmBlob(data: Float32Array): Blob {
-  const l = data.length;
-  const int16 = new Int16Array(l);
-  for (let i = 0; i < l; i++) {
-    // Convert Float32 (-1.0 to 1.0) to Int16
-    const s = Math.max(-1, Math.min(1, data[i]));
-    int16[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
-  }
-  return {
-    data: arrayBufferToBase64(int16.buffer),
-    mimeType: 'audio/pcm;rate=16000',
+  // Amplitude LFO — makes it pulse like actual crying (breath pattern)
+  const ampLfo = audioContext.createOscillator();
+  const ampLfoGain = audioContext.createGain();
+  ampLfo.type = 'sine';
+  ampLfo.frequency.value = 1.8; // ~2 cries per second
+  ampLfoGain.gain.value = 0.15;
+  ampLfo.connect(ampLfoGain);
+  ampLfoGain.connect(masterGain.gain);
+
+  // Bandpass filter to cut low rumble and shape into a more vocal sound
+  const filter = audioContext.createBiquadFilter();
+  filter.type = 'bandpass';
+  filter.frequency.value = 700;
+  filter.Q.value = 1.2;
+
+  osc.connect(filter);
+  filter.connect(masterGain);
+
+  osc.start();
+  pitchLfo.start();
+  ampLfo.start();
+
+  return () => {
+    try {
+      masterGain.gain.setValueAtTime(masterGain.gain.value, audioContext.currentTime);
+      masterGain.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.1);
+      setTimeout(() => {
+        try { osc.stop(); pitchLfo.stop(); ampLfo.stop(); masterGain.disconnect(); } catch (e) {}
+      }, 150);
+    } catch (e) {}
   };
-}
-
-export async function decodeAudioData(
-  data: Uint8Array,
-  ctx: AudioContext,
-  sampleRate: number = 24000,
-  numChannels: number = 1,
-): Promise<AudioBuffer> {
-  const dataInt16 = new Int16Array(data.buffer);
-  const frameCount = dataInt16.length / numChannels;
-  const buffer = ctx.createBuffer(numChannels, frameCount, sampleRate);
-
-  for (let channel = 0; channel < numChannels; channel++) {
-    const channelData = buffer.getChannelData(channel);
-    for (let i = 0; i < frameCount; i++) {
-      channelData[i] = dataInt16[i * numChannels + channel] / 32768.0;
-    }
-  }
-  return buffer;
 }

@@ -1,59 +1,28 @@
-
 export const BABY_MEDIA = {
-  SLEEPING: { 
-    type: 'video', 
-    src: 'https://videos.pexels.com/video-files/3205798/3205798-hd_1920_1080_25fps.mp4' 
+  SLEEPING: {
+    type: 'video',
+    src: 'https://videos.pexels.com/video-files/3205798/3205798-hd_1920_1080_25fps.mp4'
   },
-  CRYING: { 
-    type: 'image', 
-    // A very expressive crying baby image
-    src: 'https://images.unsplash.com/photo-1516737384526-e904148256b7?q=80&w=1000&auto=format&fit=crop' 
+  CRYING: {
+    type: 'image',
+    src: 'https://images.unsplash.com/photo-1516737384526-e904148256b7?q=80&w=1000&auto=format&fit=crop'
   },
-  LISTENING: { 
-    type: 'video', 
-    src: 'https://videos.pexels.com/video-files/3245379/3245379-hd_1920_1080_25fps.mp4' 
-  },
-  HAPPY: { 
-    type: 'video', 
-    src: 'https://videos.pexels.com/video-files/3245379/3245379-hd_1920_1080_25fps.mp4' 
+  LISTENING: {
+    type: 'video',
+    src: 'https://videos.pexels.com/video-files/3245379/3245379-hd_1920_1080_25fps.mp4'
   },
   PAUSED: {
     type: 'video',
-    src: 'https://videos.pexels.com/video-files/3205798/3205798-hd_1920_1080_25fps.mp4' 
+    src: 'https://videos.pexels.com/video-files/3205798/3205798-hd_1920_1080_25fps.mp4'
   }
 };
 
-export const CRYING_LEVELS = [
-  {
-    label: "Whining",
-    src: "https://www.soundjay.com/human/sounds/baby-crying-01.mp3",
-    color: "bg-yellow-600"
-  },
-  {
-    label: "Wailing",
-    src: "https://www.soundjay.com/human/sounds/baby-crying-02.mp3",
-    color: "bg-orange-500"
-  },
-  {
-    label: "Screaming",
-    src: "https://www.soundjay.com/human/sounds/baby-crying-03.mp3",
-    color: "bg-red-500"
-  },
-  {
-    label: "Meltdown",
-    src: "https://www.soundjay.com/human/sounds/baby-crying-06.mp3",
-    color: "bg-red-700"
-  }
+// Sensitivity levels — how long before baby cries
+export const SENSITIVITY_LEVELS = [
+  { label: 'Chill',     silenceMs: 5000, color: 'bg-yellow-600', audioSrc: 'https://quicksounds.com/uploads/tracks/1355384241_119010098_1119435478.mp3' },
+  { label: 'Normal',    silenceMs: 2000, color: 'bg-orange-500', audioSrc: 'https://bigsoundbank.com/UPLOAD/mp3/0877.mp3' },
+  { label: 'Screaming', silenceMs: 800,  color: 'bg-red-500',    audioSrc: 'https://bigsoundbank.com/UPLOAD/mp3/0233.mp3' },
+  { label: 'Meltdown',  silenceMs: 300,  color: 'bg-red-700',    audioSrc: 'https://bigsoundbank.com/UPLOAD/mp3/0881.mp3' },
 ];
 
-export const BABY_AUDIO = {
-  // Default fallback
-  CRYING: CRYING_LEVELS[1].src,
-};
-
-export const GEMINI_LIVE_MODEL = 'gemini-2.5-flash-native-audio-preview-09-2025';
-export const STORY_MODEL = 'gemini-2.5-flash';
-
-// Thresholds
-export const SPEECH_THRESHOLD = 0.05; // Must be louder than this to count as reading
-export const SILENCE_TOLERANCE_MS = 2000; // 2 seconds of silence before crying
+export const SPEECH_THRESHOLD = 0.05;
